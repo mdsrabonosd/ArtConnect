@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="public-hero">
+    <h1>Original paintings, and a way to commission your own.</h1>
+    <p>ArtConnect brings painters and art lovers together. The public gallery is the next phase; the admin panel is ready now.</p>
+    <div class="d-flex gap-2 flex-wrap">
+        @if (User.Identity?.IsAuthenticated == true && User.IsInRole(AppRoles.Admin))
+        {
+            <a class="btn btn-primary" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Open admin panel</a>
+        }
+        else if (User.Identity?.IsAuthenticated != true)
+        {
+            <a class="btn btn-primary" asp-area="" asp-controller="Account" asp-action="Login">Sign in</a>
+        }
+    </div>
+</section>

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Business/">
+    <Project Path="ArtConnect.Facade/ArtConnect.Facade.csproj" />
+  </Folder>
+  <Folder Name="/Library/">
+    <Project Path="ArtConnect.DataAccess/ArtConnect.DataAccess.csproj" />
+    <Project Path="ArtConnect.Entities/ArtConnect.Entities.csproj" />
+    <Project Path="ArtConnect.Framework/ArtConnect.Framework.csproj" />
+  </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="ArtConnect.Web.UI/ArtConnect.Web.UI.csproj" />
+  </Folder>
+</Solution>

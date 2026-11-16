@@ -1,0 +1,27 @@
+@model ArtistProfile
+@{
+    ViewData["Title"] = "Artist details";
+}
+<div class="page-head">
+    <div>
+        <h1>Artist details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <dl class="detail-list">
+        <dt>Name</dt><dd>@Model.User.FullName</dd>
+        <dt>Email</dt><dd>@Model.User.Email</dd>
+        <dt>Phone</dt><dd>@(string.IsNullOrWhiteSpace(Model.User.PhoneNumber) ? "-" : Model.User.PhoneNumber)</dd>
+        <dt>Experience</dt><dd>@Model.ExperienceYears years</dd>
+        <dt>Skills</dt><dd>@(string.IsNullOrWhiteSpace(Model.Skills) ? "-" : Model.Skills)</dd>
+        <dt>Bio</dt><dd>@Model.Bio</dd>
+        <dt>Verification</dt><dd>@(Model.IsVerified ? "Verified on " + Model.VerifiedAt.ToDateText() : "Not verified")</dd>
+        <dt>Created</dt><dd>@Model.CreatedAt.ToDateText()</dd>
+    </dl>
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

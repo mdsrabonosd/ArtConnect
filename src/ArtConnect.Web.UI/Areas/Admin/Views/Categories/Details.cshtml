@@ -1,0 +1,22 @@
+@model Category
+@{
+    ViewData["Title"] = "Category details";
+}
+<div class="page-head">
+    <div>
+        <h1>Category details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <dl class="detail-list">
+        <dt>Name</dt><dd>@Model.Name</dd>
+        <dt>Created</dt><dd>@Model.CreatedAt.ToDateText()</dd>
+        <dt>Last updated</dt><dd>@Model.UpdatedAt.ToDateText()</dd>
+    </dl>
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

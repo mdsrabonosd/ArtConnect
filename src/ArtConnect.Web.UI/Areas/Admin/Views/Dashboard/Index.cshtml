@@ -1,0 +1,96 @@
+@model DashboardSummary
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-head">
+    <div>
+        <h1>Dashboard</h1>
+        <p>A quick look at the people, artworks and activity on ArtConnect.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Artworks" asp-action="Create"><i class="bi bi-plus-lg"></i> Add artwork</a>
+</div>
+
+<section class="ledger-strip panel">
+    <div class="ledger-cell">
+        <span class="ledger-num">@Model.TotalArtworks</span>
+        <span class="ledger-label">Artworks</span>
+    </div>
+    <div class="ledger-cell">
+        <span class="ledger-num">@Model.TotalArtists</span>
+        <span class="ledger-label">Artists (@Model.VerifiedArtists verified)</span>
+    </div>
+    <div class="ledger-cell">
+        <span class="ledger-num">@Model.TotalCustomers</span>
+        <span class="ledger-label">Customers</span>
+    </div>
+    <div class="ledger-cell">
+        <span class="ledger-num">@Model.TotalCategories</span>
+        <span class="ledger-label">Categories</span>
+    </div>
+    <div class="ledger-cell">
+        <span class="ledger-num">@Model.OpenRequests</span>
+        <span class="ledger-label">Open custom requests</span>
+    </div>
+    <div class="ledger-cell">
+        <span class="ledger-num">@Model.TotalOrders</span>
+        <span class="ledger-label">Orders</span>
+    </div>
+</section>
+
+<div class="row g-4 mt-1">
+    <div class="col-xl-7">
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Latest artworks</h2>
+                <a asp-controller="Artworks" asp-action="Index">View all</a>
+            </div>
+            @if (Model.RecentArtworks.Count == 0)
+            {
+                <div class="empty"><i class="bi bi-image"></i><p>No artworks yet. Add an artist, then upload the first painting.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table ledger">
+                        <thead><tr><th>Title</th><th>Artist</th><th>Price</th><th>Status</th></tr></thead>
+                        <tbody>
+                        @foreach (var art in Model.RecentArtworks)
+                        {
+                            <tr>
+                                <td><a asp-controller="Artworks" asp-action="Details" asp-route-id="@art.Id">@art.Title</a></td>
+                                <td>@art.ArtistProfile.User.FullName</td>
+                                <td>@art.Price.ToMoney()</td>
+                                <td><span class="pill @(art.Status == ArtworkStatus.Available ? "pill-ok" : "pill-muted")">@art.Status</span></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-xl-5">
+        <section class="panel">
+            <div class="panel-head">
+                <h2>New accounts</h2>
+                <a asp-controller="Users" asp-action="Index">View all</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table ledger">
+                    <thead><tr><th>Name</th><th>Email</th><th>Joined</th></tr></thead>
+                    <tbody>
+                    @foreach (var user in Model.RecentUsers)
+                    {
+                        <tr>
+                            <td>@user.FullName</td>
+                            <td class="muted">@user.Email</td>
+                            <td>@user.CreatedAt.ToDateText()</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>

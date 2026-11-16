@@ -1,0 +1,55 @@
+@model List<Artwork>
+@{
+    ViewData["Title"] = "Artworks";
+}
+<div class="page-head">
+    <div>
+        <h1>Artworks</h1>
+        <p>Every painting uploaded to ArtConnect.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add artwork</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-image"></i><p>No artworks yet. Add an artist profile, then upload the first painting.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th></th><th>Title</th><th>Artist</th><th>Category</th><th>Price</th><th>Type</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    var image = item.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl ?? item.Images.FirstOrDefault()?.ImageUrl;
+                    <tr>
+                        <td class="thumb-cell">
+                            @if (image != null)
+                            {
+                                <img src="@image" alt="@item.Title" class="thumb" />
+                            }
+                            else
+                            {
+                                <span class="thumb thumb-empty"><i class="bi bi-image"></i></span>
+                            }
+                        </td>
+                        <td>@item.Title</td>
+                        <td>@item.ArtistProfile.User.FullName</td>
+                        <td>@item.Category.Name</td>
+                        <td>@item.Price.ToMoney()</td>
+                        <td>@(item.IsOriginal ? "Original" : "Print")</td>
+                        <td><span class="pill @(item.Status == ArtworkStatus.Available ? "pill-ok" : "pill-muted")">@item.Status</span></td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

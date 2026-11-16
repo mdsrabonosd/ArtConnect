@@ -1,0 +1,25 @@
+## Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vscode/
+.idea/
+*.log
+TestResults/
+artifacts/
+publish/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Uploaded files (keep the folder)
+src/ArtConnect.Web.UI/wwwroot/uploads/*
+!src/ArtConnect.Web.UI/wwwroot/uploads/.gitkeep
+
+## Secrets
+appsettings.Production.json
+secrets.json

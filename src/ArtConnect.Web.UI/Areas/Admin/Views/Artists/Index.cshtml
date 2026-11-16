@@ -1,0 +1,64 @@
+@model List<ArtistProfile>
+@{
+    ViewData["Title"] = "Artists";
+}
+<div class="page-head">
+    <div>
+        <h1>Artists</h1>
+        <p>Artist profiles. Verify an artist to show the verified badge on their profile.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add artist profile</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-person-video2"></i><p>No artist profiles yet. Create a user with the Artist role first, then add the profile here.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Artist</th><th>Email</th><th>Experience</th><th>Verification</th><th>Created</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.User.FullName</td>
+                        <td class="muted">@item.User.Email</td>
+                        <td>@item.ExperienceYears yr</td>
+                        <td>
+                            @if (item.IsVerified)
+                            {
+                                <span class="pill pill-gold"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill-muted">Not verified</span>
+                            }
+                        </td>
+                        <td>@item.CreatedAt.ToDateText()</td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            @if (item.IsVerified)
+                            {
+                                <form asp-action="Unverify" asp-route-id="@item.Id" method="post" class="d-inline">
+                                    <button type="submit" class="icon-btn" title="Remove verification"><i class="bi bi-patch-minus"></i></button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="Verify" asp-route-id="@item.Id" method="post" class="d-inline">
+                                    <button type="submit" class="icon-btn" title="Verify artist"><i class="bi bi-patch-check"></i></button>
+                                </form>
+                            }
+                            <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

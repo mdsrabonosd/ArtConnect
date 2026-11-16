@@ -1,0 +1,54 @@
+@using ArtConnect.Web.UI.Areas.Admin.Models
+@model UserCreateViewModel
+@{
+    ViewData["Title"] = "Add user";
+}
+<div class="page-head">
+    <div>
+        <h1>Add user</h1>
+        <p>Create an account and choose its role.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" autofocus />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Role" class="form-label"></label>
+                <select asp-for="Role" class="form-select" asp-items="(SelectList)ViewBag.Roles"></select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                <div class="form-text">At least 8 characters with a capital letter, a small letter and a number.</div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+        </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Create user</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+    </div>
+    </form>
+</section>

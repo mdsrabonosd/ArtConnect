@@ -1,0 +1,69 @@
+@model List<UserListItem>
+@{
+    ViewData["Title"] = "Users";
+    var currentUserId = (int)(ViewBag.CurrentUserId ?? 0);
+}
+<div class="page-head">
+    <div>
+        <h1>Users</h1>
+        <p>Admins, artists and customers. Block a user to stop them from signing in.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add user</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-people"></i><p>No users found.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.User.FullName</td>
+                        <td class="muted">@item.User.Email</td>
+                        <td>@(string.IsNullOrWhiteSpace(item.User.PhoneNumber) ? "-" : item.User.PhoneNumber)</td>
+                        <td><span class="pill pill-role">@item.Role</span></td>
+                        <td>
+                            @if (item.User.IsBlocked)
+                            {
+                                <span class="pill pill-bad">Blocked</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill-ok">Active</span>
+                            }
+                        </td>
+                        <td>@item.User.CreatedAt.ToDateText()</td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.User.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.User.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            @if (item.User.Id != currentUserId)
+                            {
+                                if (item.User.IsBlocked)
+                                {
+                                    <form asp-action="Unblock" asp-route-id="@item.User.Id" method="post" class="d-inline">
+                                        <button type="submit" class="icon-btn" title="Unblock"><i class="bi bi-unlock"></i></button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Block" asp-route-id="@item.User.Id" method="post" class="d-inline">
+                                        <button type="submit" class="icon-btn" title="Block"><i class="bi bi-slash-circle"></i></button>
+                                    </form>
+                                }
+                                <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.User.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

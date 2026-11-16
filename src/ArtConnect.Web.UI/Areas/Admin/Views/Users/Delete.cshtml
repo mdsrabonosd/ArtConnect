@@ -1,0 +1,21 @@
+@model UserListItem
+@{
+    ViewData["Title"] = "Delete user";
+}
+<div class="page-head">
+    <div>
+        <h1>Delete user</h1>
+        <p>The account stays in the database but the user can no longer sign in.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <p class="confirm-text">Delete <strong>@Model.User.FullName</strong> (@Model.User.Email)?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.User.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete user</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>

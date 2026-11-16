@@ -1,0 +1,69 @@
+@model Artwork
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<input type="hidden" asp-for="Id" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="ArtistProfileId" class="form-label"></label>
+        <select asp-for="ArtistProfileId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Artists">
+            <option value="">Select an artist</option>
+        </select>
+        <span asp-validation-for="ArtistProfileId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Categories">
+            <option value="">Select a category</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" maxlength="200" />
+        <span asp-validation-for="Title" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Price" class="form-label">Price (BDT)</label>
+        <input asp-for="Price" class="form-control" type="number" step="0.01" min="0.01" />
+        <span asp-validation-for="Price" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Medium" class="form-label"></label>
+        <input asp-for="Medium" class="form-control" maxlength="100" placeholder="Oil on canvas" />
+        <span asp-validation-for="Medium" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Size" class="form-label"></label>
+        <input asp-for="Size" class="form-control" maxlength="50" />
+        <span asp-validation-for="Size" class="text-danger small"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<ArtworkStatus>()"></select>
+    </div>
+    <div class="col-12">
+        <div class="form-check">
+            <input asp-for="IsOriginal" class="form-check-input" />
+            <label asp-for="IsOriginal" class="form-check-label"></label>
+        </div>
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4" maxlength="2000"></textarea>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+    <div class="col-12">
+        <label class="form-label" for="imageFile">Main image (JPG or PNG, up to 5 MB)</label>
+        <input type="file" id="imageFile" name="imageFile" class="form-control" accept=".jpg,.jpeg,.png" />
+        @Html.ValidationMessage("imageFile", new { @class = "text-danger small" })
+        @if (Model.Images != null && Model.Images.Any())
+        {
+            var current = Model.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl ?? Model.Images.First().ImageUrl;
+            <div class="current-image">
+                <img src="@current" alt="Current image" class="thumb thumb-lg" />
+                <span class="muted">Current image. Choose a file only if you want to replace it.</span>
+            </div>
+        }
+    </div>
+</div>

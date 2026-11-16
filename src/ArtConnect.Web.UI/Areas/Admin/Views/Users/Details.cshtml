@@ -1,0 +1,25 @@
+@model UserListItem
+@{
+    ViewData["Title"] = "User details";
+}
+<div class="page-head">
+    <div>
+        <h1>User details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <dl class="detail-list">
+        <dt>Full name</dt><dd>@Model.User.FullName</dd>
+        <dt>Email</dt><dd>@Model.User.Email</dd>
+        <dt>Phone</dt><dd>@(string.IsNullOrWhiteSpace(Model.User.PhoneNumber) ? "-" : Model.User.PhoneNumber)</dd>
+        <dt>Role</dt><dd>@Model.Role</dd>
+        <dt>Status</dt><dd>@(Model.User.IsBlocked ? "Blocked" : "Active")</dd>
+        <dt>Joined</dt><dd>@Model.User.CreatedAt.ToDateText()</dd>
+    </dl>
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.User.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

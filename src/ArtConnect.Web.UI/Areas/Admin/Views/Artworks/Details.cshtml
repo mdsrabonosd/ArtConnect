@@ -1,0 +1,38 @@
+@model Artwork
+@{
+    ViewData["Title"] = "Artwork details";
+}
+<div class="page-head">
+    <div>
+        <h1>Artwork details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    @if (Model.Images.Any())
+    {
+        <div class="gallery">
+            @foreach (var image in Model.Images.OrderByDescending(i => i.IsMain))
+            {
+                <img src="@image.ImageUrl" alt="@Model.Title" class="gallery-img" />
+            }
+        </div>
+    }
+    <dl class="detail-list">
+        <dt>Title</dt><dd>@Model.Title</dd>
+        <dt>Artist</dt><dd>@Model.ArtistProfile.User.FullName</dd>
+        <dt>Category</dt><dd>@Model.Category.Name</dd>
+        <dt>Medium</dt><dd>@Model.Medium</dd>
+        <dt>Size</dt><dd>@(string.IsNullOrWhiteSpace(Model.Size) ? "-" : Model.Size)</dd>
+        <dt>Price</dt><dd>@Model.Price.ToMoney()</dd>
+        <dt>Type</dt><dd>@(Model.IsOriginal ? "Original painting" : "Print")</dd>
+        <dt>Status</dt><dd>@Model.Status</dd>
+        <dt>Description</dt><dd>@(string.IsNullOrWhiteSpace(Model.Description) ? "-" : Model.Description)</dd>
+        <dt>Created</dt><dd>@Model.CreatedAt.ToDateText()</dd>
+    </dl>
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

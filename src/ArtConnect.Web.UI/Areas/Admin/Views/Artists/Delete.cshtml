@@ -1,0 +1,21 @@
+@model ArtistProfile
+@{
+    ViewData["Title"] = "Delete artist profile";
+}
+<div class="page-head">
+    <div>
+        <h1>Delete artist profile</h1>
+        <p>An artist who still has artworks cannot be deleted.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <p class="confirm-text">Delete the profile of <strong>@Model.User.FullName</strong>?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete profile</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>
