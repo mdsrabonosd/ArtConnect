@@ -1,0 +1,42 @@
+@model List<Comment>
+@{
+    ViewData["Title"] = "Comments";
+}
+<div class="page-head">
+    <div>
+        <h1>Comments</h1>
+        <p>Comments on artworks. Delete the ones that are not appropriate.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add comment</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-chat-dots"></i><p>No comments yet. Comments appear here when users write them on artworks.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Artwork</th><th>Written by</th><th>Comment</th><th>Posted</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@(item.Artwork?.Title ?? "(deleted artwork)")</td>
+                        <td>@item.User.FullName</td>
+                        <td>@item.Text</td>
+                        <td>@item.CreatedAt.ToDateText()</td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

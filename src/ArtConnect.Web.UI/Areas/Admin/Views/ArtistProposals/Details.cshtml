@@ -1,0 +1,27 @@
+@model ArtistProposal
+@{
+    ViewData["Title"] = "Proposal details";
+}
+<div class="page-head">
+    <div>
+        <h1>Proposal details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <dl class="detail-list">
+        <dt>Request</dt><dd>@Model.CustomRequest.Title</dd>
+        <dt>Artist</dt><dd>@Model.ArtistProfile.User.FullName</dd>
+        <dt>Price</dt><dd>@Model.Price.ToMoney()</dd>
+        <dt>Delivery time</dt><dd>@Model.DeliveryDays days</dd>
+        <dt>Revisions included</dt><dd>@Model.RevisionsIncluded</dd>
+        <dt>Status</dt><dd>@Model.Status</dd>
+        <dt>Message</dt><dd>@Model.Message</dd>
+        <dt>Created</dt><dd>@Model.CreatedAt.ToDateText()</dd>
+    </dl>
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

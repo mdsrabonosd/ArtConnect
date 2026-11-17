@@ -1,0 +1,54 @@
+@model Order
+@{
+    ViewData["Title"] = "Order details";
+}
+<div class="page-head">
+    <div>
+        <h1>Order details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <dl class="detail-list">
+        <dt>Order</dt><dd>#@Model.Id</dd>
+        <dt>Customer</dt><dd>@Model.Customer.FullName (@Model.Customer.Email)</dd>
+        <dt>Artist</dt><dd>@Model.ArtistProfile.User.FullName</dd>
+        <dt>Type</dt><dd>@Model.OrderType</dd>
+        <dt>Total</dt><dd>@Model.TotalAmount.ToMoney()</dd>
+        <dt>Commission</dt><dd>@Model.CommissionAmount.ToMoney()</dd>
+        <dt>Status</dt><dd>@Model.Status</dd>
+        <dt>Order date</dt><dd>@Model.OrderDate.ToDateText()</dd>
+        <dt>Proposal</dt><dd>@(Model.ProposalId.HasValue ? "#" + Model.ProposalId : "-")</dd>
+    </dl>
+    @if (Model.Items.Any())
+    {
+        <h2 class="h5 mt-4">Purchased paintings</h2>
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Artwork</th><th>Price</th></tr></thead>
+                <tbody>
+                @foreach (var line in Model.Items)
+                {
+                    <tr><td>@(line.Artwork?.Title ?? "(deleted artwork)")</td><td>@line.Price.ToMoney()</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    @if (Model.ProgressPhotos.Any())
+    {
+        <h2 class="h5 mt-4">Progress photos</h2>
+        <div class="gallery">
+            @foreach (var photo in Model.ProgressPhotos)
+            {
+                <img src="@photo.ImageUrl" alt="Progress photo" class="gallery-img" />
+            }
+        </div>
+    }
+
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

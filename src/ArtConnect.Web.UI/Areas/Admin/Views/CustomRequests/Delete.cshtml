@@ -1,0 +1,21 @@
+@model CustomRequest
+@{
+    ViewData["Title"] = "Delete custom request";
+}
+<div class="page-head">
+    <div>
+        <h1>Delete custom request</h1>
+        <p>A request that already has proposals cannot be deleted. Set it to Cancelled instead.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <p class="confirm-text">Delete the request <strong>@Model.Title</strong> from @Model.Customer.FullName?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete custom request</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>

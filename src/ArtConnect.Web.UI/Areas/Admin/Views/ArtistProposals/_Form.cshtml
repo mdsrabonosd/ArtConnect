@@ -1,0 +1,46 @@
+@model ArtistProposal
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<input type="hidden" asp-for="Id" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="RequestId" class="form-label">Custom request</label>
+        <select asp-for="RequestId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Requests">
+                <option value="">Select...</option>
+            </select>
+        <span asp-validation-for="RequestId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ArtistProfileId" class="form-label">Artist</label>
+        <select asp-for="ArtistProfileId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Artists">
+                <option value="">Select...</option>
+            </select>
+        <span asp-validation-for="ArtistProfileId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Price" class="form-label">Price (BDT)</label>
+        <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" />
+        <span asp-validation-for="Price" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="DeliveryDays" class="form-label">Delivery time (days)</label>
+        <input asp-for="DeliveryDays" class="form-control" type="number" min="1" max="365" />
+        <span asp-validation-for="DeliveryDays" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="RevisionsIncluded" class="form-label">Revisions included (0 to 5)</label>
+        <input asp-for="RevisionsIncluded" class="form-control" type="number" min="0" max="5" />
+        <span asp-validation-for="RevisionsIncluded" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Status" class="form-label">Status</label>
+        <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<ProposalStatus>()"></select>
+        <span asp-validation-for="Status" class="text-danger small"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Message" class="form-label">Message to the customer</label>
+        <textarea asp-for="Message" class="form-control" rows="4" maxlength="500"></textarea>
+        <span asp-validation-for="Message" class="text-danger small"></span>
+    </div>
+</div>

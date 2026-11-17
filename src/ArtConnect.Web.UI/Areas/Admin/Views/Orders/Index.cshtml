@@ -1,0 +1,46 @@
+@model List<Order>
+@{
+    ViewData["Title"] = "Orders";
+}
+<div class="page-head">
+    <div>
+        <h1>Orders</h1>
+        <p>Purchase orders and accepted commissions. Leave commission at 0 to calculate 10% automatically.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add order</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-bag-check"></i><p>No orders yet. Orders are created when a customer buys a painting or accepts a proposal.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Order</th><th>Customer</th><th>Artist</th><th>Type</th><th>Total</th><th>Commission</th><th>Status</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.Id</td>
+                        <td>@item.Customer.FullName</td>
+                        <td>@item.ArtistProfile.User.FullName</td>
+                        <td>@item.OrderType</td>
+                        <td>@item.TotalAmount.ToMoney()</td>
+                        <td>@item.CommissionAmount.ToMoney()</td>
+                        <td><span class="pill @(item.Status == OrderStatus.Delivered ? "pill-ok" : item.Status == OrderStatus.Cancelled ? "pill-bad" : item.Status == OrderStatus.InProgress ? "pill-role" : "pill-muted")">@item.Status</span></td>
+                        <td>@item.OrderDate.ToDateText()</td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

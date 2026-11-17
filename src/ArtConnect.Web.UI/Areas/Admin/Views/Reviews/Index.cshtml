@@ -1,0 +1,44 @@
+@model List<Review>
+@{
+    ViewData["Title"] = "Reviews";
+}
+<div class="page-head">
+    <div>
+        <h1>Reviews</h1>
+        <p>Ratings that customers leave after an order is delivered.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add review</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-star"></i><p>No reviews yet. Customers can review an order after it is delivered.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Order</th><th>Customer</th><th>Artist</th><th>Rating</th><th>Comment</th><th>Created</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.OrderId</td>
+                        <td>@item.Customer.FullName</td>
+                        <td>@item.ArtistProfile.User.FullName</td>
+                        <td><span class="stars" aria-label="@item.Rating out of 5">@(new string('\u2605', item.Rating))<span class="stars-off">@(new string('\u2605', 5 - item.Rating))</span></span></td>
+                        <td>@(string.IsNullOrWhiteSpace(item.Comment) ? "-" : item.Comment)</td>
+                        <td>@item.CreatedAt.ToDateText()</td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

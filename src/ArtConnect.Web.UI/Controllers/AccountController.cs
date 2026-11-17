@@ -2,8 +2,10 @@ using ArtConnect.Entities;
 using ArtConnect.Facade.Interface;
 using ArtConnect.Framework;
 using ArtConnect.Web.UI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ArtConnect.Web.UI.Controllers
 {
@@ -22,6 +24,11 @@ namespace ArtConnect.Web.UI.Controllers
             _userManager = userManager;
             _userFacade = userFacade;
         }
+
+        private int CurrentUserId =>
+            int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : 0;
+
+        // ---------------- Login ----------------
 
         [HttpGet]
         [Route(UrlRewrite.Account.Login)]
@@ -74,11 +81,57 @@ namespace ArtConnect.Web.UI.Controllers
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 return LocalRedirect(model.ReturnUrl);
 
+            // Role-based landing page
             if (await _userManager.IsInRoleAsync(user, AppRoles.Admin))
                 return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
 
             return RedirectToAction("Index", "Home");
         }
+
+        // ---------------- Registration ----------------
+
+        [HttpGet]
+        [Route(UrlRewrite.Account.Register)]
+        public IActionResult Register()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+                return RedirectToAction("Index", "Home");
+
+            return View(new RegisterViewModel { Role = AppRoles.Customer });
+        }
+
+        [HttpPost]
+        [Route(UrlRewrite.Account.Register)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = new ApplicationUser
+            {
+                FullName = model.FullName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber
+            };
+
+            var result = await _userFacade.RegisterAsync(
+                user, model.Password, model.Role, model.Bio, model.ExperienceYears);
+
+            if (!result.Success)
+            {
+                ModelState.AddModelError(string.Empty, result.Message);
+                return View(model);
+            }
+
+            // Sign the new user in right away.
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            TempData["Success"] = "Welcome to ArtConnect! Your account is ready.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // ---------------- Logout ----------------
 
         [HttpPost]
         [Route(UrlRewrite.Account.Logout)]
@@ -88,6 +141,91 @@ namespace ArtConnect.Web.UI.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(Login));
         }
+
+        // ---------------- My profile ----------------
+
+        [Authorize]
+        [HttpGet]
+        [Route(UrlRewrite.Account.Profile)]
+        public async Task<IActionResult> Profile()
+        {
+            var item = await _userFacade.GetUserByIdAsync(CurrentUserId);
+            if (item == null)
+                return RedirectToAction(nameof(Login));
+
+            return View(new ProfileViewModel
+            {
+                FullName = item.User.FullName,
+                Email = item.User.Email ?? string.Empty,
+                PhoneNumber = item.User.PhoneNumber ?? string.Empty,
+                Role = item.Role
+            });
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route(UrlRewrite.Account.Profile)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            // Email and role are shown only, so always read them again from the database.
+            var item = await _userFacade.GetUserByIdAsync(CurrentUserId);
+            if (item == null)
+                return RedirectToAction(nameof(Login));
+
+            model.Email = item.User.Email ?? string.Empty;
+            model.Role = item.Role;
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = await _userFacade.UpdateOwnProfileAsync(CurrentUserId, model.FullName, model.PhoneNumber);
+            if (!result.Success)
+            {
+                ModelState.AddModelError(string.Empty, result.Message);
+                return View(model);
+            }
+
+            TempData["Success"] = result.Message;
+            return RedirectToAction(nameof(Profile));
+        }
+
+        // ---------------- Change password ----------------
+
+        [Authorize]
+        [HttpGet]
+        [Route(UrlRewrite.Account.ChangePassword)]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route(UrlRewrite.Account.ChangePassword)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = await _userFacade.ChangePasswordAsync(CurrentUserId, model.CurrentPassword, model.NewPassword);
+            if (!result.Success)
+            {
+                ModelState.AddModelError(string.Empty, result.Message);
+                return View(model);
+            }
+
+            // Changing the password changes the security stamp, so sign the user in again.
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+                await _signInManager.RefreshSignInAsync(user);
+
+            TempData["Success"] = result.Message;
+            return RedirectToAction(nameof(Profile));
+        }
+
+        // ---------------- Access denied ----------------
 
         [Route(UrlRewrite.Account.AccessDenied)]
         public IActionResult AccessDenied()

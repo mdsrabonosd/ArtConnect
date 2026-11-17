@@ -1,0 +1,26 @@
+@model Comment
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<input type="hidden" asp-for="Id" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="ArtworkId" class="form-label">Artwork</label>
+        <select asp-for="ArtworkId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Artworks">
+                <option value="">Select...</option>
+            </select>
+        <span asp-validation-for="ArtworkId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="UserId" class="form-label">Written by</label>
+        <select asp-for="UserId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Users">
+                <option value="">Select...</option>
+            </select>
+        <span asp-validation-for="UserId" class="text-danger small"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Text" class="form-label">Comment</label>
+        <textarea asp-for="Text" class="form-control" rows="4" maxlength="300"></textarea>
+        <span asp-validation-for="Text" class="text-danger small"></span>
+    </div>
+</div>

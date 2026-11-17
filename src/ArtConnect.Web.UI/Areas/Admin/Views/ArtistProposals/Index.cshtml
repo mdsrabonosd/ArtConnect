@@ -1,0 +1,43 @@
+@model List<ArtistProposal>
+@{
+    ViewData["Title"] = "Proposals";
+}
+<div class="page-head">
+    <div>
+        <h1>Proposals</h1>
+        <p>Offers that artists send for custom requests.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> Add proposal</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-chat-left-text"></i><p>No proposals yet. Artists send proposals for open custom requests.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Request</th><th>Artist</th><th>Price</th><th>Delivery</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CustomRequest.Title</td>
+                        <td>@item.ArtistProfile.User.FullName</td>
+                        <td>@item.Price.ToMoney()</td>
+                        <td>@item.DeliveryDays days</td>
+                        <td><span class="pill @(item.Status == ProposalStatus.Accepted ? "pill-ok" : item.Status == ProposalStatus.Rejected ? "pill-bad" : item.Status == ProposalStatus.Pending ? "pill-role" : "pill-muted")">@item.Status</span></td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View"><i class="bi bi-eye"></i></a>
+                            <a class="icon-btn" asp-action="Edit" asp-route-id="@item.Id" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <a class="icon-btn danger" asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

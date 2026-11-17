@@ -23,10 +23,11 @@ Dependency direction: `Web.UI -> Facade -> DataAccess -> Entities -> Framework`
 - One repository and one facade for each of the 14 entities in the ER diagram
 - ASP.NET Core Identity with integer keys, roles `Admin`, `Artist`, `Customer`
 - Seeded roles, default admin account and 8 default categories
-- Login, logout, access denied page, blocked users cannot sign in
+- Login, logout, **registration** (Customer or Artist, auto sign-in), **My profile** and **Change password**, access denied page
+- Blocked or deleted users cannot sign in; Admin is never available on the public registration form
 - Role-based authorization: every page in the Admin area needs the `Admin` role
 - Admin panel: layout, navigation, dashboard
-- Full CRUD (insert, update, soft delete, get all, get by id) for Users, Artists, Artworks and Categories
+- Full CRUD (insert, update, soft delete, get all, get by id) for **Users, Artists, Artworks, Categories, Custom requests, Proposals, Orders, Comments and Reviews**
 
 ## Setup
 
@@ -59,12 +60,22 @@ Change these in the `SeedAdmin` section of `appsettings.json` before the first r
 
 Sign in at `/login`. Admins go to `/Admin/Dashboard`.
 
+## Public pages
+
+| URL | Purpose |
+| --- | --- |
+| `/register` | Create a Customer or Artist account (artists also write a short bio and get an artist profile) |
+| `/login` | Sign in. Admin goes to the admin panel, others go to the home page |
+| `/profile` | Update name and phone number |
+| `/change-password` | Change password |
+
 ## Try the CRUD flow
 
 1. **Users > Add user**: create a user with the `Artist` role.
 2. **Artists > Add artist profile**: attach a profile to that user, then use the verify button.
 3. **Artworks > Add artwork**: choose the artist and category, upload a JPG or PNG.
-4. Edit, view and delete from each list. Delete is a soft delete, so rows stay in the database with `IsDeleted = 1`.
+4. **Custom requests**: add a request for a customer. **Proposals**: add an offer from the artist. **Orders**: create an order and set it to Delivered. **Reviews**: add a review for that delivered order. **Comments**: moderate comments on artworks.
+5. Edit, view and delete from each list. Delete is a soft delete, so rows stay in the database with `IsDeleted = 1`.
 
 ## Business rules already enforced
 
@@ -75,9 +86,20 @@ Sign in at `/login`. Admins go to `/Admin/Dashboard`.
 - Passwords: at least 8 characters with a capital letter, a small letter and a number
 - Blocking a user also signs them out of open sessions
 
+## Packages and vulnerability warnings
+
+`Microsoft.EntityFrameworkCore.SqlServer` depends on `Microsoft.Data.SqlClient`, which still resolves `System.Security.Cryptography.Pkcs` 9.0.11 (advisories GHSA-846f-f764-76mx and GHSA-2fmv-rv2c-59x7). The projects `ArtConnect.DataAccess`, `ArtConnect.Facade` and `ArtConnect.Web.UI` therefore reference the patched `System.Security.Cryptography.Pkcs` **10.0.13** directly. To check:
+
+```
+dotnet restore
+dotnet list package --vulnerable --include-transitive
+```
+
+When a newer SqlClient fixes this, the three `System.Security.Cryptography.Pkcs` lines can be removed.
+
 ## Next phases
 
-Art feed (likes, comments, follows), custom requests and proposals, order management, cart and reviews, then chat, notifications and payment. The entities and repositories for these already exist.
+Customer and Artist dashboards, the public art feed (likes, comments, follows), cart and checkout, customer-side request and proposal screens, then chat, notifications and payment. The entities, repositories and facades for these already exist.
 
 ## Notes
 

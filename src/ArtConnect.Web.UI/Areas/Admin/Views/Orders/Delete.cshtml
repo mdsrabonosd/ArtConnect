@@ -1,0 +1,21 @@
+@model Order
+@{
+    ViewData["Title"] = "Delete order";
+}
+<div class="page-head">
+    <div>
+        <h1>Delete order</h1>
+        <p>A delivered order cannot be deleted.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <p class="confirm-text">Delete order <strong>#@Model.Id</strong> of @Model.Customer.FullName?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete order</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>

@@ -1,3 +1,4 @@
+using ArtConnect.DataAccess.Interface;
 using ArtConnect.Entities;
 using ArtConnect.Facade.Interface;
 using ArtConnect.Facade.Models;
@@ -10,10 +11,14 @@ namespace ArtConnect.Facade.Implementation
     public class UserFacade : IUserFacade
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IArtistProfileRepository _profileRepository;
 
-        public UserFacade(UserManager<ApplicationUser> userManager)
+        public UserFacade(
+            UserManager<ApplicationUser> userManager,
+            IArtistProfileRepository profileRepository)
         {
             _userManager = userManager;
+            _profileRepository = profileRepository;
         }
 
         public async Task<List<UserListItem>> GetUsersAsync()
@@ -134,6 +139,62 @@ namespace ArtConnect.Facade.Implementation
             await _userManager.UpdateSecurityStampAsync(user);
 
             return OperationResult.Ok("User deleted.");
+        }
+
+        public async Task<OperationResult> RegisterAsync(
+            ApplicationUser user, string password, string role, string? bio, int experienceYears)
+        {
+            ArgumentNullException.ThrowIfNull(user);
+
+            // Nobody can register as Admin.
+            if (role != AppRoles.Customer && role != AppRoles.Artist)
+                return OperationResult.Fail("You can register only as a Customer or an Artist.");
+
+            if (role == AppRoles.Artist && string.IsNullOrWhiteSpace(bio))
+                return OperationResult.Fail("Please write a short bio. Artists need a bio.");
+
+            var created = await CreateUserAsync(user, password, role);
+            if (!created.Success)
+                return created;
+
+            if (role == AppRoles.Artist)
+            {
+                await _profileRepository.AddAsync(new ArtistProfile
+                {
+                    UserId = user.Id,
+                    Bio = bio!.Trim(),
+                    ExperienceYears = experienceYears
+                });
+            }
+
+            return OperationResult.Ok("Your account was created.");
+        }
+
+        public async Task<OperationResult> UpdateOwnProfileAsync(int id, string fullName, string? phoneNumber)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null || user.IsDeleted)
+                return OperationResult.Fail("User not found.");
+
+            user.FullName = fullName.Trim();
+            user.PhoneNumber = phoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded
+                ? OperationResult.Ok("Your profile was updated.")
+                : OperationResult.Fail(string.Join(" ", result.Errors.Select(e => e.Description)));
+        }
+
+        public async Task<OperationResult> ChangePasswordAsync(int id, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null || user.IsDeleted)
+                return OperationResult.Fail("User not found.");
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            return result.Succeeded
+                ? OperationResult.Ok("Your password was changed.")
+                : OperationResult.Fail(string.Join(" ", result.Errors.Select(e => e.Description)));
         }
     }
 }

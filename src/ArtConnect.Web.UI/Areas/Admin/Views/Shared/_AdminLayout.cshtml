@@ -34,9 +34,14 @@
                 <a class="@Active("Artworks")" asp-area="Admin" asp-controller="Artworks" asp-action="Index"><i class="bi bi-image"></i> Artworks</a>
                 <a class="@Active("Categories")" asp-area="Admin" asp-controller="Categories" asp-action="Index"><i class="bi bi-tags"></i> Categories</a>
 
-                <span class="side-group">Coming next</span>
-                <span class="disabled-link"><i class="bi bi-brush"></i> Custom requests</span>
-                <span class="disabled-link"><i class="bi bi-bag-check"></i> Orders</span>
+                <span class="side-group">Commissions</span>
+                <a class="@Active("CustomRequests")" asp-area="Admin" asp-controller="CustomRequests" asp-action="Index"><i class="bi bi-brush"></i> Custom requests</a>
+                <a class="@Active("ArtistProposals")" asp-area="Admin" asp-controller="ArtistProposals" asp-action="Index"><i class="bi bi-chat-left-text"></i> Proposals</a>
+                <a class="@Active("Orders")" asp-area="Admin" asp-controller="Orders" asp-action="Index"><i class="bi bi-bag-check"></i> Orders</a>
+
+                <span class="side-group">Community</span>
+                <a class="@Active("Comments")" asp-area="Admin" asp-controller="Comments" asp-action="Index"><i class="bi bi-chat-dots"></i> Comments</a>
+                <a class="@Active("Reviews")" asp-area="Admin" asp-controller="Reviews" asp-action="Index"><i class="bi bi-star"></i> Reviews</a>
             </nav>
         </aside>
 

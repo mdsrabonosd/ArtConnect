@@ -14,25 +14,40 @@
 <body class="public-body">
     <header class="public-bar">
         <a class="brand-mark" asp-controller="Home" asp-action="Index">ArtConnect</a>
-        <nav class="d-flex align-items-center gap-2">
+        <nav class="d-flex align-items-center gap-2 flex-wrap">
             @if (User.Identity?.IsAuthenticated == true)
             {
                 if (User.IsInRole(AppRoles.Admin))
                 {
                     <a class="btn btn-primary btn-sm" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin panel</a>
                 }
+                <a class="btn btn-outline-light btn-sm" asp-area="" asp-controller="Account" asp-action="Profile"><i class="bi bi-person-circle"></i> My account</a>
                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>
+                    <button type="submit" class="btn btn-outline-light btn-sm">Sign out</button>
                 </form>
             }
             else
             {
-                <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Account" asp-action="Login">Sign in</a>
+                <a class="btn btn-outline-light btn-sm" asp-area="" asp-controller="Account" asp-action="Login">Sign in</a>
+                <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Account" asp-action="Register">Create account</a>
             }
         </nav>
     </header>
     <main class="public-main">
+        @if (TempData["Success"] is string success)
+        {
+            <div class="alert alert-success d-flex align-items-center gap-2" role="status">
+                <i class="bi bi-check-circle"></i> <span>@success</span>
+            </div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle"></i> <span>@error</span>
+            </div>
+        }
         @RenderBody()
     </main>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

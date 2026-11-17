@@ -7,6 +7,9 @@ namespace ArtConnect.Framework
         {
             public const string Login = "login";
             public const string Logout = "logout";
+            public const string Register = "register";
+            public const string Profile = "profile";
+            public const string ChangePassword = "change-password";
             public const string AccessDenied = "access-denied";
         }
 

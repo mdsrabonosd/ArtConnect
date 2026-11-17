@@ -1,0 +1,21 @@
+@model Review
+@{
+    ViewData["Title"] = "Delete review";
+}
+<div class="page-head">
+    <div>
+        <h1>Delete review</h1>
+        <p>The review is hidden from the system. The record stays in the database.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <p class="confirm-text">Delete the review of order <strong>#@Model.OrderId</strong>?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete review</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,25 @@
+@model Review
+@{
+    ViewData["Title"] = "Review details";
+}
+<div class="page-head">
+    <div>
+        <h1>Review details</h1>
+        <p></p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <dl class="detail-list">
+        <dt>Order</dt><dd>#@Model.OrderId</dd>
+        <dt>Customer</dt><dd>@Model.Customer.FullName</dd>
+        <dt>Artist</dt><dd>@Model.ArtistProfile.User.FullName</dd>
+        <dt>Rating</dt><dd>@Model.Rating out of 5</dd>
+        <dt>Comment</dt><dd>@(string.IsNullOrWhiteSpace(Model.Comment) ? "-" : Model.Comment)</dd>
+        <dt>Created</dt><dd>@Model.CreatedAt.ToDateText()</dd>
+    </dl>
+    <div class="form-actions">
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to list</a>
+    </div>
+</section>

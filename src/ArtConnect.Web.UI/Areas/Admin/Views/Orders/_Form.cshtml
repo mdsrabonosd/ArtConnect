@@ -1,0 +1,53 @@
+@model Order
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+<input type="hidden" asp-for="Id" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="CustomerId" class="form-label">Customer</label>
+        <select asp-for="CustomerId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Customers">
+                <option value="">Select...</option>
+            </select>
+        <span asp-validation-for="CustomerId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ArtistProfileId" class="form-label">Artist</label>
+        <select asp-for="ArtistProfileId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Artists">
+                <option value="">Select...</option>
+            </select>
+        <span asp-validation-for="ArtistProfileId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ProposalId" class="form-label">Proposal (optional)</label>
+        <select asp-for="ProposalId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Proposals">
+                <option value="">None</option>
+            </select>
+        <span asp-validation-for="ProposalId" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="OrderType" class="form-label">Order type</label>
+        <select asp-for="OrderType" class="form-select" asp-items="Html.GetEnumSelectList<OrderType>()"></select>
+        <span asp-validation-for="OrderType" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="TotalAmount" class="form-label">Total amount (BDT)</label>
+        <input asp-for="TotalAmount" class="form-control" type="number" step="0.01" min="0" />
+        <span asp-validation-for="TotalAmount" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="CommissionAmount" class="form-label">Commission (BDT, 0 = auto 10%)</label>
+        <input asp-for="CommissionAmount" class="form-control" type="number" step="0.01" min="0" />
+        <span asp-validation-for="CommissionAmount" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Status" class="form-label">Status</label>
+        <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<OrderStatus>()"></select>
+        <span asp-validation-for="Status" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="OrderDate" class="form-label">Order date</label>
+        <input asp-for="OrderDate" class="form-control" type="date" asp-format="{0:yyyy-MM-dd}" />
+        <span asp-validation-for="OrderDate" class="text-danger small"></span>
+    </div>
+</div>
