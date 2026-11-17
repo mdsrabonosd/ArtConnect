@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Api/">
+    <Project Path="ArtConnect.Web.API/ArtConnect.Web.API.csproj" Id="ff6d073d-dad9-4999-a2e8-34c043a60d19" />
+  </Folder>
   <Folder Name="/Business/">
     <Project Path="ArtConnect.Facade/ArtConnect.Facade.csproj" />
   </Folder>
