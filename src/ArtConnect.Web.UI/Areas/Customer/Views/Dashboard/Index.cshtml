@@ -1,0 +1,53 @@
+@model CustomerDashboard
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<div class="page-head">
+    <div>
+        <h1>Welcome back</h1>
+        <p>Here is what is happening with your requests and orders.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Requests" asp-action="Create"><i class="bi bi-plus-lg"></i> Post a custom request</a>
+</div>
+
+<section class="ledger-strip panel">
+    <div class="ledger-cell"><span class="ledger-num">@Model.OpenRequests</span><span class="ledger-label">Open requests</span></div>
+    <div class="ledger-cell"><span class="ledger-num">@Model.PendingProposals</span><span class="ledger-label">Proposals to review</span></div>
+    <div class="ledger-cell"><span class="ledger-num">@Model.ActiveOrders</span><span class="ledger-label">Active orders</span></div>
+    <div class="ledger-cell"><span class="ledger-num">@Model.WishlistCount</span><span class="ledger-label">Saved paintings</span></div>
+</section>
+
+<section class="panel mt-4">
+    <div class="panel-head">
+        <h2>Recent requests</h2>
+        <a asp-controller="Requests" asp-action="Index">View all</a>
+    </div>
+    @if (Model.RecentRequests.Count == 0)
+    {
+        <div class="empty">
+            <i class="bi bi-brush"></i>
+            <p>You have not posted a request yet. Describe the painting you want and artists will send you offers.</p>
+            <a class="btn btn-primary" asp-controller="Requests" asp-action="Create">Post a custom request</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Title</th><th>Budget</th><th>Deadline</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.RecentRequests)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.BudgetMin.ToMoney() to @item.BudgetMax.ToMoney()</td>
+                        <td>@item.Deadline.ToDateText()</td>
+                        <td><span class="pill @(item.Status == RequestStatus.Open ? "pill-ok" : item.Status == RequestStatus.Accepted ? "pill-role" : item.Status == RequestStatus.Cancelled ? "pill-bad" : "pill-muted")">@item.Status</span></td>
+                        <td class="text-end"><a asp-controller="Requests" asp-action="Details" asp-route-id="@item.Id">Open</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

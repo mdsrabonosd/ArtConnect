@@ -1,0 +1,21 @@
+@model Artwork
+@{
+    ViewData["Title"] = "Delete artwork";
+}
+<div class="page-head">
+    <div>
+        <h1>Delete artwork</h1>
+        <p>The painting is removed from the gallery.</p>
+    </div>
+</div>
+
+<section class="panel form-panel">
+    <p class="confirm-text">Delete <strong>@Model.Title</strong>?</p>
+    <form asp-action="Delete" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete artwork</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>

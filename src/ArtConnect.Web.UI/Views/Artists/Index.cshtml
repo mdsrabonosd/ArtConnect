@@ -1,0 +1,37 @@
+@model List<ArtistProfile>
+@{
+    ViewData["Title"] = "Artists";
+    ViewData["Wide"] = true;
+}
+
+<div class="page-head">
+    <div>
+        <h1>Artists</h1>
+        <p>Painters on ArtConnect. Verified artists are listed first.</p>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="empty panel"><i class="bi bi-person-video2"></i><p>No artists yet.</p></div>
+}
+else
+{
+    <div class="artist-grid">
+        @foreach (var artist in Model)
+        {
+            <a class="artist-card panel" asp-action="Details" asp-route-id="@artist.Id">
+                <span class="avatar">@artist.User.FullName.Substring(0, 1).ToUpper()</span>
+                <span class="artist-name">
+                    @artist.User.FullName
+                    @if (artist.IsVerified)
+                    {
+                        <i class="bi bi-patch-check-fill verified" title="Verified artist"></i>
+                    }
+                </span>
+                <span class="muted small">@artist.ExperienceYears years of experience</span>
+                <span class="artist-bio">@artist.Bio</span>
+            </a>
+        }
+    </div>
+}

@@ -27,5 +27,30 @@ namespace ArtConnect.DataAccess.Implementation
                 .Include(x => x.Category)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<List<CustomRequest>> GetByCustomerAsync(int customerId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(r => r.Customer)
+                .Include(r => r.Category)
+                .Where(r => r.CustomerId == customerId)
+                .OrderByDescending(r => r.Id)
+                .ToListAsync();
+        }
+
+        public async Task<List<CustomRequest>> GetOpenAsync(int? categoryId)
+        {
+            var query = _dbSet
+                .AsNoTracking()
+                .Include(r => r.Customer)
+                .Include(r => r.Category)
+                .Where(r => r.Status == RequestStatus.Open && !r.Customer.IsBlocked && !r.Customer.IsDeleted);
+
+            if (categoryId.HasValue)
+                query = query.Where(r => r.CategoryId == categoryId.Value);
+
+            return await query.OrderByDescending(r => r.Id).ToListAsync();
+        }
     }
 }

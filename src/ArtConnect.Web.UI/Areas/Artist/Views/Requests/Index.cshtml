@@ -1,0 +1,51 @@
+@model List<CustomRequest>
+@{
+    ViewData["Title"] = "Open requests";
+}
+<div class="page-head">
+    <div>
+        <h1>Open requests</h1>
+        <p>Customers are waiting for proposals. Open a request to see the details and send yours.</p>
+    </div>
+</div>
+
+<form method="get" asp-action="Index" class="filter-bar panel">
+    <div class="filter-field grow">
+        <label for="categoryId" class="form-label">Category</label>
+        <select id="categoryId" name="categoryId" class="form-select" asp-items="(IEnumerable<SelectListItem>)ViewBag.Categories">
+            <option value="">All categories</option>
+        </select>
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Clear</a>
+    </div>
+</form>
+
+<section class="panel mt-3">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-brush"></i><p>There are no open requests right now. Check again soon.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Request</th><th>Customer</th><th>Category</th><th>Budget</th><th>Needed by</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Customer.FullName</td>
+                        <td>@item.Category.Name</td>
+                        <td>@item.BudgetMin.ToMoney() to @item.BudgetMax.ToMoney()</td>
+                        <td>@item.Deadline.ToDateText()</td>
+                        <td class="text-end"><a class="btn btn-primary btn-sm" asp-action="Details" asp-route-id="@item.Id">View and propose</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

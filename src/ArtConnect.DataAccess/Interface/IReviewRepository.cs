@@ -6,5 +6,7 @@ namespace ArtConnect.DataAccess.Interface
     {
         Task<List<Review>> GetAllWithDetailsAsync();
         Task<Review?> GetByIdWithDetailsAsync(int id);
+
+        Task<List<Review>> GetByArtistAsync(int artistProfileId);
     }
 }

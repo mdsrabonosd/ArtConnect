@@ -29,5 +29,15 @@ namespace ArtConnect.DataAccess.Implementation
                 .Include(x => x.ArtistProfile).ThenInclude(y => y.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<List<Review>> GetByArtistAsync(int artistProfileId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(r => r.Customer)
+                .Where(r => r.ArtistProfileId == artistProfileId)
+                .OrderByDescending(r => r.Id)
+                .ToListAsync();
+        }
     }
 }

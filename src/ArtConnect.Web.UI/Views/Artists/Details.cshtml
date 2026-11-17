@@ -1,0 +1,55 @@
+@model ArtistPortfolioModel
+@{
+    var profile = Model.Profile;
+    ViewData["Title"] = profile.User.FullName;
+    ViewData["Wide"] = true;
+}
+
+<a class="back-link" asp-action="Index"><i class="bi bi-arrow-left"></i> All artists</a>
+
+<section class="artist-head panel">
+    <span class="avatar avatar-lg">@profile.User.FullName.Substring(0, 1).ToUpper()</span>
+    <div>
+        <h1>
+            @profile.User.FullName
+            @if (profile.IsVerified)
+            {
+                <i class="bi bi-patch-check-fill verified" title="Verified artist"></i>
+            }
+        </h1>
+        <p class="muted mb-2">
+            @profile.ExperienceYears years of experience
+            @if (!string.IsNullOrWhiteSpace(profile.Skills))
+            {
+                <span> · @profile.Skills</span>
+            }
+        </p>
+        <p class="mb-2">@profile.Bio</p>
+        @if (Model.ReviewCount > 0)
+        {
+            <span class="stars">@(new string('\u2605', (int)Math.Round(Model.AverageRating)))<span class="stars-off">@(new string('\u2605', 5 - (int)Math.Round(Model.AverageRating)))</span></span>
+            <span class="muted small">@Model.AverageRating.ToString("0.0") from @Model.ReviewCount review@(Model.ReviewCount == 1 ? "" : "s")</span>
+        }
+        else
+        {
+            <span class="muted small">No reviews yet</span>
+        }
+    </div>
+</section>
+
+<section class="mt-4">
+    <div class="section-head"><h2>Portfolio</h2></div>
+    @if (Model.Artworks.Count == 0)
+    {
+        <div class="empty panel"><i class="bi bi-image"></i><p>This artist has not uploaded a painting yet.</p></div>
+    }
+    else
+    {
+        <div class="art-grid">
+            @foreach (var art in Model.Artworks)
+            {
+                <partial name="_ArtworkCard" model="art" />
+            }
+        </div>
+    }
+</section>

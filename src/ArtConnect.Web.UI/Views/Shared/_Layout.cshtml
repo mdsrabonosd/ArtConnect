@@ -1,3 +1,11 @@
+@{
+    var cartCount = 0;
+    if (User.IsInRole(AppRoles.Customer) && Context.Session.IsAvailable)
+    {
+        cartCount = SessionCart.Count(Context.Session);
+    }
+    var wide = ViewData["Wide"] is true;
+}
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,15 +21,28 @@
 </head>
 <body class="public-body">
     <header class="public-bar">
-        <a class="brand-mark" asp-controller="Home" asp-action="Index">ArtConnect</a>
-        <nav class="d-flex align-items-center gap-2 flex-wrap">
+        <a class="brand-mark" asp-area="" asp-controller="Home" asp-action="Index">ArtConnect</a>
+        <nav class="public-links">
+            <a asp-area="" asp-controller="Gallery" asp-action="Index">Gallery</a>
+            <a asp-area="" asp-controller="Artists" asp-action="Index">Artists</a>
+        </nav>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
             @if (User.Identity?.IsAuthenticated == true)
             {
                 if (User.IsInRole(AppRoles.Admin))
                 {
                     <a class="btn btn-primary btn-sm" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Admin panel</a>
                 }
-                <a class="btn btn-outline-light btn-sm" asp-area="" asp-controller="Account" asp-action="Profile"><i class="bi bi-person-circle"></i> My account</a>
+                if (User.IsInRole(AppRoles.Artist))
+                {
+                    <a class="btn btn-primary btn-sm" asp-area="Artist" asp-controller="Dashboard" asp-action="Index">Artist studio</a>
+                }
+                if (User.IsInRole(AppRoles.Customer))
+                {
+                    <a class="btn btn-primary btn-sm" asp-area="Customer" asp-controller="Dashboard" asp-action="Index">My space</a>
+                    <a class="btn btn-outline-light btn-sm" asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-bag"></i> Cart@(cartCount > 0 ? $" ({cartCount})" : "")</a>
+                }
+                <a class="btn btn-outline-light btn-sm" asp-area="" asp-controller="Account" asp-action="Profile"><i class="bi bi-person-circle"></i> Account</a>
                 <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
                     <button type="submit" class="btn btn-outline-light btn-sm">Sign out</button>
                 </form>
@@ -31,21 +52,10 @@
                 <a class="btn btn-outline-light btn-sm" asp-area="" asp-controller="Account" asp-action="Login">Sign in</a>
                 <a class="btn btn-primary btn-sm" asp-area="" asp-controller="Account" asp-action="Register">Create account</a>
             }
-        </nav>
+        </div>
     </header>
-    <main class="public-main">
-        @if (TempData["Success"] is string success)
-        {
-            <div class="alert alert-success d-flex align-items-center gap-2" role="status">
-                <i class="bi bi-check-circle"></i> <span>@success</span>
-            </div>
-        }
-        @if (TempData["Error"] is string error)
-        {
-            <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> <span>@error</span>
-            </div>
-        }
+    <main class="public-main @(wide ? "wide" : "")">
+        <partial name="_Alerts" />
         @RenderBody()
     </main>
     @await RenderSectionAsync("Scripts", required: false)

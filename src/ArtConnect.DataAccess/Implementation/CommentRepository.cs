@@ -27,5 +27,15 @@ namespace ArtConnect.DataAccess.Implementation
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<List<Comment>> GetByArtworkAsync(int artworkId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(c => c.User)
+                .Where(c => c.ArtworkId == artworkId)
+                .OrderByDescending(c => c.Id)
+                .ToListAsync();
+        }
     }
 }

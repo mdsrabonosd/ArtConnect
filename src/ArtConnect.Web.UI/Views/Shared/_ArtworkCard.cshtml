@@ -1,0 +1,34 @@
+@model Artwork
+@{
+    var image = Model.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl ?? Model.Images.FirstOrDefault()?.ImageUrl;
+}
+<article class="art-card">
+    <a class="art-card-media" asp-area="" asp-controller="Gallery" asp-action="Details" asp-route-id="@Model.Id">
+        @if (image != null)
+        {
+            <img src="@image" alt="@Model.Title" loading="lazy" />
+        }
+        else
+        {
+            <span class="art-card-empty"><i class="bi bi-image"></i></span>
+        }
+        @if (Model.Status == ArtworkStatus.Sold)
+        {
+            <span class="badge-sold">Sold</span>
+        }
+    </a>
+    <div class="art-card-body">
+        <a class="art-title" asp-area="" asp-controller="Gallery" asp-action="Details" asp-route-id="@Model.Id">@Model.Title</a>
+        <span class="art-meta">
+            by <a asp-area="" asp-controller="Artists" asp-action="Details" asp-route-id="@Model.ArtistProfileId">@Model.ArtistProfile.User.FullName</a>
+            @if (Model.ArtistProfile.IsVerified)
+            {
+                <i class="bi bi-patch-check-fill verified" title="Verified artist"></i>
+            }
+        </span>
+        <div class="art-foot">
+            <span class="price">@Model.Price.ToMoney()</span>
+            <span class="muted small">@Model.Category.Name</span>
+        </div>
+    </div>
+</article>

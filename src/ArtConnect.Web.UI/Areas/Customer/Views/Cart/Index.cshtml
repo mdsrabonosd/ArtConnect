@@ -1,0 +1,54 @@
+@model List<Artwork>
+@{
+    ViewData["Title"] = "Cart";
+    var total = Model.Sum(a => a.Price);
+}
+<div class="page-head">
+    <div>
+        <h1>Cart</h1>
+        <p>Paintings you are about to buy.</p>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="empty panel"><i class="bi bi-bag"></i><p>Your cart is empty.</p>
+        <a class="btn btn-primary" asp-area="" asp-controller="Gallery" asp-action="Index">Browse the gallery</a></div>
+}
+else
+{
+    <section class="panel">
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th></th><th>Painting</th><th>Artist</th><th>Price</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    var image = item.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl ?? item.Images.FirstOrDefault()?.ImageUrl;
+                    <tr>
+                        <td class="thumb-cell">
+                            @if (image != null) { <img src="@image" alt="@item.Title" class="thumb" /> }
+                            else { <span class="thumb thumb-empty"><i class="bi bi-image"></i></span> }
+                        </td>
+                        <td><a asp-area="" asp-controller="Gallery" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></td>
+                        <td>@item.ArtistProfile.User.FullName</td>
+                        <td>@item.Price.ToMoney()</td>
+                        <td class="text-end">
+                            <form asp-action="Remove" asp-route-id="@item.Id" method="post" class="m-0">
+                                <button type="submit" class="icon-btn danger" title="Remove"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <div class="cart-total">
+            <div><span class="muted">Total</span> <strong class="price-lg">@total.ToMoney()</strong></div>
+            <form asp-action="Checkout" method="post" class="m-0">
+                <button type="submit" class="btn btn-primary">Place order</button>
+            </form>
+        </div>
+        <p class="muted small px-4 pb-3 mb-0">Payment is simulated in this version. No money is charged.</p>
+    </section>
+}

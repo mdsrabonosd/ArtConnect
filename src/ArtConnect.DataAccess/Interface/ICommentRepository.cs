@@ -6,5 +6,7 @@ namespace ArtConnect.DataAccess.Interface
     {
         Task<List<Comment>> GetAllWithDetailsAsync();
         Task<Comment?> GetByIdWithDetailsAsync(int id);
+
+        Task<List<Comment>> GetByArtworkAsync(int artworkId);
     }
 }

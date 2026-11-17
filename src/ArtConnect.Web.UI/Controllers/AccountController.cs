@@ -85,6 +85,12 @@ namespace ArtConnect.Web.UI.Controllers
             if (await _userManager.IsInRoleAsync(user, AppRoles.Admin))
                 return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
 
+            if (await _userManager.IsInRoleAsync(user, AppRoles.Artist))
+                return RedirectToAction("Index", "Dashboard", new { area = "Artist" });
+
+            if (await _userManager.IsInRoleAsync(user, AppRoles.Customer))
+                return RedirectToAction("Index", "Dashboard", new { area = "Customer" });
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -128,7 +134,10 @@ namespace ArtConnect.Web.UI.Controllers
             await _signInManager.SignInAsync(user, isPersistent: false);
 
             TempData["Success"] = "Welcome to ArtConnect! Your account is ready.";
-            return RedirectToAction("Index", "Home");
+
+            return model.Role == AppRoles.Artist
+                ? RedirectToAction("Index", "Dashboard", new { area = "Artist" })
+                : RedirectToAction("Index", "Dashboard", new { area = "Customer" });
         }
 
         // ---------------- Logout ----------------

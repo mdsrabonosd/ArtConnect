@@ -29,5 +29,27 @@ namespace ArtConnect.DataAccess.Implementation
                 .Include(x => x.ProgressPhotos)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<List<Order>> GetByCustomerAsync(int customerId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(o => o.Customer)
+                .Include(o => o.ArtistProfile).ThenInclude(a => a.User)
+                .Where(o => o.CustomerId == customerId)
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+        }
+
+        public async Task<List<Order>> GetByArtistAsync(int artistProfileId)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(o => o.Customer)
+                .Include(o => o.ArtistProfile).ThenInclude(a => a.User)
+                .Where(o => o.ArtistProfileId == artistProfileId)
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+        }
     }
 }

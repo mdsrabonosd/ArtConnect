@@ -62,6 +62,16 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IImageUploadService, ImageUploadService>();
 
+// Session is used for the shopping cart
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = "ArtConnect.Session";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromHours(2);
+});
+
 var app = builder.Build();
 
 // Seed roles, default admin and default categories.
@@ -96,6 +106,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

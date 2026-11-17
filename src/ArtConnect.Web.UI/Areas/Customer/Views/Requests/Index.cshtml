@@ -1,0 +1,47 @@
+@model List<CustomRequest>
+@{
+    ViewData["Title"] = "My requests";
+}
+<div class="page-head">
+    <div>
+        <h1>My requests</h1>
+        <p>Custom painting requests you posted. Open a request to compare proposals.</p>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg"></i> New request</a>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-brush"></i><p>You have not posted a request yet.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Title</th><th>Category</th><th>Budget</th><th>Deadline</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Category.Name</td>
+                        <td>@item.BudgetMin.ToMoney() to @item.BudgetMax.ToMoney()</td>
+                        <td>@item.Deadline.ToDateText()</td>
+                        <td><span class="pill @(item.Status == RequestStatus.Open ? "pill-ok" : item.Status == RequestStatus.Accepted ? "pill-role" : item.Status == RequestStatus.Cancelled ? "pill-bad" : "pill-muted")">@item.Status</span></td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View proposals"><i class="bi bi-eye"></i></a>
+                            @if (item.Status == RequestStatus.Open)
+                            {
+                                <form asp-action="Cancel" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel this request?');">
+                                    <button type="submit" class="icon-btn danger" title="Cancel request"><i class="bi bi-x-circle"></i></button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

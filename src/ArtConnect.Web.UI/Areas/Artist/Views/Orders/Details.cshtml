@@ -1,0 +1,89 @@
+@model Order
+@{
+    ViewData["Title"] = "Order #" + Model.Id;
+}
+<div class="page-head">
+    <div>
+        <h1>Order #@Model.Id</h1>
+    </div>
+</div>
+
+<section class="panel form-panel mb-4" style="max-width:none">
+    <dl class="detail-list">
+        <dt>Customer</dt><dd>@Model.Customer.FullName</dd>
+        <dt>Contact</dt><dd>@Model.Customer.Email@(string.IsNullOrWhiteSpace(Model.Customer.PhoneNumber) ? "" : " · " + Model.Customer.PhoneNumber)</dd>
+        <dt>Type</dt><dd>@(Model.OrderType == OrderType.Commission ? "Custom painting" : "Purchase")</dd>
+        <dt>Total</dt><dd>@Model.TotalAmount.ToMoney()</dd>
+        <dt>Platform commission</dt><dd>@Model.CommissionAmount.ToMoney() (simulated)</dd>
+        <dt>Status</dt><dd><span class="pill @(Model.Status == OrderStatus.Delivered ? "pill-ok" : Model.Status == OrderStatus.InProgress ? "pill-role" : Model.Status == OrderStatus.Cancelled ? "pill-bad" : "pill-muted")">@Model.Status</span></dd>
+        <dt>Ordered on</dt><dd>@Model.OrderDate.ToDateText()</dd>
+    </dl>
+
+    <div class="form-actions">
+        @if (Model.Status == OrderStatus.Pending)
+        {
+            <form asp-action="Start" asp-route-id="@Model.Id" method="post" class="m-0">
+                <button type="submit" class="btn btn-primary">Start work</button>
+            </form>
+        }
+        @if (Model.Status == OrderStatus.InProgress)
+        {
+            <form asp-action="Deliver" asp-route-id="@Model.Id" method="post" class="m-0" onsubmit="return confirm('Mark this order as delivered?');">
+                <button type="submit" class="btn btn-primary">Mark as delivered</button>
+            </form>
+        }
+        <a class="btn btn-outline-secondary" asp-action="Index">Back to orders</a>
+    </div>
+</section>
+
+@if (Model.Items.Any())
+{
+    <section class="panel mb-4">
+        <div class="panel-head"><h2>Paintings in this order</h2></div>
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Painting</th><th>Price</th></tr></thead>
+                <tbody>
+                @foreach (var line in Model.Items)
+                {
+                    <tr><td>@(line.Artwork?.Title ?? "(removed artwork)")</td><td>@line.Price.ToMoney()</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+<section class="panel mb-4">
+    <div class="panel-head"><h2>Progress photos (@Model.ProgressPhotos.Count of 10)</h2></div>
+    @if (Model.ProgressPhotos.Count > 0)
+    {
+        <div class="photo-list">
+            @foreach (var photo in Model.ProgressPhotos.OrderBy(p => p.UploadedAt))
+            {
+                <figure>
+                    <img src="@photo.ImageUrl" alt="Progress photo" />
+                    <figcaption>@photo.UploadedAt.ToDateText()@(string.IsNullOrWhiteSpace(photo.Note) ? "" : " · " + photo.Note)</figcaption>
+                </figure>
+            }
+        </div>
+    }
+    @if (Model.Status == OrderStatus.InProgress)
+    {
+        <form asp-action="UploadPhoto" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="upload-row">
+            <div>
+                <label class="form-label" for="photo">Photo (JPG or PNG, up to 5 MB)</label>
+                <input type="file" id="photo" name="photo" class="form-control" accept=".jpg,.jpeg,.png" required />
+            </div>
+            <div>
+                <label class="form-label" for="note">Note (optional)</label>
+                <input id="note" name="note" class="form-control" maxlength="300" />
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    }
+    else if (Model.ProgressPhotos.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-camera"></i><p>Start the order, then upload photos so the customer can follow your work.</p></div>
+    }
+</section>

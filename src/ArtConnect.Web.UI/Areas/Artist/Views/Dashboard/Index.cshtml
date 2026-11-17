@@ -1,0 +1,64 @@
+@model ArtistDashboard
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<div class="page-head">
+    <div>
+        <h1>Your studio</h1>
+        <p>Your artworks, proposals and orders at a glance.</p>
+    </div>
+    <a class="btn btn-primary" asp-controller="Artworks" asp-action="Create"><i class="bi bi-plus-lg"></i> Upload artwork</a>
+</div>
+
+@if (!Model.Profile.IsVerified)
+{
+    <div class="alert alert-info">Your profile is not verified yet. The admin reviews artist profiles and adds the verified badge.</div>
+}
+
+<section class="ledger-strip panel">
+    <div class="ledger-cell"><span class="ledger-num">@Model.TotalArtworks</span><span class="ledger-label">Artworks</span></div>
+    <div class="ledger-cell"><span class="ledger-num">@Model.SoldArtworks</span><span class="ledger-label">Sold</span></div>
+    <div class="ledger-cell"><span class="ledger-num">@Model.PendingProposals</span><span class="ledger-label">Pending proposals</span></div>
+    <div class="ledger-cell"><span class="ledger-num">@Model.ActiveOrders</span><span class="ledger-label">Active orders</span></div>
+    <div class="ledger-cell">
+        <span class="ledger-num">@(Model.ReviewCount == 0 ? "-" : Model.AverageRating.ToString("0.0"))</span>
+        <span class="ledger-label">Rating (@Model.ReviewCount review@(Model.ReviewCount == 1 ? "" : "s"))</span>
+    </div>
+</section>
+
+<div class="row g-4 mt-1">
+    <div class="col-lg-6">
+        <section class="panel">
+            <div class="panel-head"><h2>Find work</h2></div>
+            <div class="empty" style="padding-block:1.5rem">
+                <i class="bi bi-brush"></i>
+                <p>Customers post custom painting requests with a budget. Send a proposal to win the job.</p>
+                <a class="btn btn-primary" asp-controller="Requests" asp-action="Index">See open requests</a>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-6">
+        <section class="panel">
+            <div class="panel-head"><h2>Latest reviews</h2></div>
+            @if (Model.LatestReviews.Count == 0)
+            {
+                <div class="empty" style="padding-block:1.5rem"><i class="bi bi-star"></i><p>No reviews yet. Reviews appear after a customer receives an order.</p></div>
+            }
+            else
+            {
+                <ul class="comment-list px-4 pb-3">
+                    @foreach (var review in Model.LatestReviews)
+                    {
+                        <li>
+                            <div class="comment-head">
+                                <strong>@review.Customer.FullName</strong>
+                                <span class="stars">@(new string('\u2605', review.Rating))<span class="stars-off">@(new string('\u2605', 5 - review.Rating))</span></span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(review.Comment)) { <p>@review.Comment</p> }
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    </div>
+</div>

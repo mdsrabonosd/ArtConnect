@@ -6,5 +6,8 @@ namespace ArtConnect.DataAccess.Interface
     {
         Task<List<CustomRequest>> GetAllWithDetailsAsync();
         Task<CustomRequest?> GetByIdWithDetailsAsync(int id);
+
+        Task<List<CustomRequest>> GetByCustomerAsync(int customerId);
+        Task<List<CustomRequest>> GetOpenAsync(int? categoryId);
     }
 }

@@ -1,0 +1,45 @@
+@model List<ArtistProposal>
+@{
+    ViewData["Title"] = "My proposals";
+}
+<div class="page-head">
+    <div>
+        <h1>My proposals</h1>
+        <p>Offers you sent for custom requests.</p>
+    </div>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-chat-left-text"></i><p>You have not sent a proposal yet. Open a request to send your first one.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Request</th><th>Price</th><th>Delivery</th><th>Sent</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CustomRequest.Title</td>
+                        <td>@item.Price.ToMoney()</td>
+                        <td>@item.DeliveryDays days</td>
+                        <td>@item.CreatedAt.ToDateText()</td>
+                        <td><span class="pill @(item.Status == ProposalStatus.Accepted ? "pill-ok" : item.Status == ProposalStatus.Pending ? "pill-role" : item.Status == ProposalStatus.Rejected ? "pill-bad" : "pill-muted")">@item.Status</span></td>
+                        <td class="text-end row-actions">
+                            @if (item.Status == ProposalStatus.Pending)
+                            {
+                                <form asp-action="Withdraw" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Withdraw this proposal?');">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">Withdraw</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

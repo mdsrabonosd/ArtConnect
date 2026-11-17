@@ -1,0 +1,88 @@
+@model GalleryIndexViewModel
+@{
+    ViewData["Title"] = "Gallery";
+    ViewData["Wide"] = true;
+    var filter = Model.Filter;
+}
+
+<div class="page-head">
+    <div>
+        <h1>Gallery</h1>
+        <p>Search by title or artist, then narrow by category, medium and price.</p>
+    </div>
+</div>
+
+<form method="get" asp-action="Index" class="filter-bar panel">
+    <div class="filter-field grow">
+        <label for="Search" class="form-label">Search</label>
+        <input id="Search" name="Search" value="@filter.Search" class="form-control" placeholder="Title, artist or keyword" />
+    </div>
+    <div class="filter-field">
+        <label for="CategoryId" class="form-label">Category</label>
+        <select id="CategoryId" name="CategoryId" class="form-select">
+            <option value="">All categories</option>
+            @foreach (var category in Model.Categories)
+            {
+                <option value="@category.Id" selected="@(filter.CategoryId == category.Id)">@category.Name</option>
+            }
+        </select>
+    </div>
+    <div class="filter-field">
+        <label for="Medium" class="form-label">Medium</label>
+        <select id="Medium" name="Medium" class="form-select">
+            <option value="">Any medium</option>
+            @foreach (var medium in Model.Mediums)
+            {
+                <option value="@medium" selected="@(filter.Medium == medium)">@medium</option>
+            }
+        </select>
+    </div>
+    <div class="filter-field narrow">
+        <label for="MinPrice" class="form-label">Min price</label>
+        <input id="MinPrice" name="MinPrice" type="number" min="0" step="1" value="@filter.MinPrice" class="form-control" />
+    </div>
+    <div class="filter-field narrow">
+        <label for="MaxPrice" class="form-label">Max price</label>
+        <input id="MaxPrice" name="MaxPrice" type="number" min="0" step="1" value="@filter.MaxPrice" class="form-control" />
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-primary">Search</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Clear</a>
+    </div>
+</form>
+
+@if (Model.Error != null)
+{
+    <div class="alert alert-warning">@Model.Error</div>
+}
+
+<p class="muted result-count">@Model.Result.TotalCount painting@(Model.Result.TotalCount == 1 ? "" : "s") found</p>
+
+@if (Model.Result.Items.Count == 0)
+{
+    <div class="empty panel"><i class="bi bi-search"></i><p>No paintings match your search. Try fewer filters.</p></div>
+}
+else
+{
+    <div class="art-grid">
+        @foreach (var art in Model.Result.Items)
+        {
+            <partial name="_ArtworkCard" model="art" />
+        }
+    </div>
+}
+
+@if (Model.Result.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (Model.Result.HasPrevious)
+        {
+            <a class="btn btn-outline-secondary btn-sm" asp-action="Index" asp-route-Search="@filter.Search" asp-route-CategoryId="@filter.CategoryId" asp-route-Medium="@filter.Medium" asp-route-MinPrice="@filter.MinPrice" asp-route-MaxPrice="@filter.MaxPrice" asp-route-Page="@(Model.Result.Page - 1)">Previous</a>
+        }
+        <span class="muted">Page @Model.Result.Page of @Model.Result.TotalPages</span>
+        @if (Model.Result.HasNext)
+        {
+            <a class="btn btn-outline-secondary btn-sm" asp-action="Index" asp-route-Search="@filter.Search" asp-route-CategoryId="@filter.CategoryId" asp-route-Medium="@filter.Medium" asp-route-MinPrice="@filter.MinPrice" asp-route-MaxPrice="@filter.MaxPrice" asp-route-Page="@(Model.Result.Page + 1)">Next</a>
+        }
+    </nav>
+}

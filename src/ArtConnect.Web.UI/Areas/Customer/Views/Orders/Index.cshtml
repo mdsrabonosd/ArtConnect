@@ -1,0 +1,41 @@
+@model List<Order>
+@{
+    ViewData["Title"] = "My orders";
+}
+<div class="page-head">
+    <div>
+        <h1>My orders</h1>
+        <p>Paintings you bought and commissions you accepted.</p>
+    </div>
+</div>
+
+<section class="panel">
+    @if (Model.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-bag-check"></i><p>No orders yet. Buy a painting or accept a proposal to create one.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Order</th><th>Artist</th><th>Type</th><th>Total</th><th>Status</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>#@item.Id</td>
+                        <td>@item.ArtistProfile.User.FullName</td>
+                        <td>@item.OrderType</td>
+                        <td>@item.TotalAmount.ToMoney()</td>
+                        <td><span class="pill @(item.Status == OrderStatus.Delivered ? "pill-ok" : item.Status == OrderStatus.InProgress ? "pill-role" : item.Status == OrderStatus.Cancelled ? "pill-bad" : "pill-muted")">@item.Status</span></td>
+                        <td>@item.OrderDate.ToDateText()</td>
+                        <td class="text-end row-actions">
+                            <a class="icon-btn" asp-action="Details" asp-route-id="@item.Id" title="View order"><i class="bi bi-eye"></i></a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

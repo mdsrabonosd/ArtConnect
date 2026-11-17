@@ -67,6 +67,11 @@ namespace ArtConnect.Facade
             services.AddScoped<IUserFacade, UserFacade>();
             services.AddScoped<IDashboardFacade, DashboardFacade>();
 
+            // Public site and user panels
+            services.AddScoped<IGalleryFacade, GalleryFacade>();
+            services.AddScoped<ICustomerFacade, CustomerFacade>();
+            services.AddScoped<IArtistPanelFacade, ArtistPanelFacade>();
+
             return services;
         }
     }

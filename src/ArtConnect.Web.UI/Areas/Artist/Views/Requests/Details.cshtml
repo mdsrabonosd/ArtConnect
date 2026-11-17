@@ -1,0 +1,71 @@
+@model OpenRequestViewModel
+@{
+    var request = Model.Request;
+    ViewData["Title"] = request.Title;
+}
+<div class="page-head">
+    <div>
+        <h1>@request.Title</h1>
+        <p>Read the request, then send your price and delivery time.</p>
+    </div>
+</div>
+
+<section class="panel form-panel mb-4" style="max-width:none">
+    <dl class="detail-list">
+        <dt>Customer</dt><dd>@request.Customer.FullName</dd>
+        <dt>Category</dt><dd>@request.Category.Name</dd>
+        <dt>Canvas size</dt><dd>@request.CanvasSize</dd>
+        <dt>Budget</dt><dd>@request.BudgetMin.ToMoney() to @request.BudgetMax.ToMoney()</dd>
+        <dt>Needed by</dt><dd>@request.Deadline.ToDateText()</dd>
+        <dt>Description</dt><dd>@request.Description</dd>
+    </dl>
+    @if (!string.IsNullOrWhiteSpace(request.ReferenceImageUrl))
+    {
+        <div class="gallery mt-3"><img src="@request.ReferenceImageUrl" alt="Reference photo" class="gallery-img" /></div>
+    }
+</section>
+
+<section class="panel form-panel" style="max-width:none">
+    @if (Model.MyProposal != null && Model.MyProposal.Status != ProposalStatus.Withdrawn)
+    {
+        <h2 class="h5">Your proposal</h2>
+        <p class="mb-1">@Model.MyProposal.Price.ToMoney() in @Model.MyProposal.DeliveryDays days, @Model.MyProposal.RevisionsIncluded revision@(Model.MyProposal.RevisionsIncluded == 1 ? "" : "s").</p>
+        <p class="muted mb-2">@Model.MyProposal.Message</p>
+        <span class="pill pill-role">@Model.MyProposal.Status</span>
+        <div class="form-actions"><a class="btn btn-outline-secondary" asp-controller="Proposals" asp-action="Index">See my proposals</a></div>
+    }
+    else
+    {
+        <h2 class="h5">Send a proposal</h2>
+        <form asp-action="Send" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input type="hidden" name="RequestId" value="@request.Id" />
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" for="Price">Your price (BDT)</label>
+                    <input id="Price" name="Price" type="number" step="0.01" min="0.01" class="form-control" value="@(Model.Form.Price == 0 ? "" : Model.Form.Price.ToString("0.##"))" required />
+                    @Html.ValidationMessage("Price", new { @class = "text-danger small" })
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="DeliveryDays">Delivery time (days)</label>
+                    <input id="DeliveryDays" name="DeliveryDays" type="number" min="1" max="365" class="form-control" value="@Model.Form.DeliveryDays" required />
+                    @Html.ValidationMessage("DeliveryDays", new { @class = "text-danger small" })
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="RevisionsIncluded">Revisions included (0 to 5)</label>
+                    <input id="RevisionsIncluded" name="RevisionsIncluded" type="number" min="0" max="5" class="form-control" value="@Model.Form.RevisionsIncluded" required />
+                    @Html.ValidationMessage("RevisionsIncluded", new { @class = "text-danger small" })
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="Message">Message to the customer (10 to 500 characters)</label>
+                    <textarea id="Message" name="Message" rows="4" maxlength="500" class="form-control" required>@Model.Form.Message</textarea>
+                    @Html.ValidationMessage("Message", new { @class = "text-danger small" })
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Send proposal</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Back to requests</a>
+            </div>
+        </form>
+    }
+</section>

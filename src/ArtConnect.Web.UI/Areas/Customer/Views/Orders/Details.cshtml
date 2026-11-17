@@ -1,0 +1,98 @@
+@model Order
+@{
+    ViewData["Title"] = "Order #" + Model.Id;
+}
+<div class="page-head">
+    <div>
+        <h1>Order #@Model.Id</h1>
+    </div>
+</div>
+
+<section class="panel form-panel mb-4" style="max-width:none">
+    <dl class="detail-list">
+        <dt>Artist</dt><dd><a asp-area="" asp-controller="Artists" asp-action="Details" asp-route-id="@Model.ArtistProfileId">@Model.ArtistProfile.User.FullName</a></dd>
+        <dt>Type</dt><dd>@(Model.OrderType == OrderType.Commission ? "Custom painting" : "Purchase")</dd>
+        <dt>Total</dt><dd>@Model.TotalAmount.ToMoney()</dd>
+        <dt>Status</dt><dd><span class="pill @(Model.Status == OrderStatus.Delivered ? "pill-ok" : Model.Status == OrderStatus.InProgress ? "pill-role" : Model.Status == OrderStatus.Cancelled ? "pill-bad" : "pill-muted")">@Model.Status</span></dd>
+        <dt>Ordered on</dt><dd>@Model.OrderDate.ToDateText()</dd>
+    </dl>
+    <p class="muted small mt-3 mb-0">Payment is simulated in this version. No money is charged.</p>
+</section>
+
+@if (Model.Items.Any())
+{
+    <section class="panel mb-4">
+        <div class="panel-head"><h2>Paintings in this order</h2></div>
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Painting</th><th>Price</th></tr></thead>
+                <tbody>
+                @foreach (var line in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            @if (line.Artwork != null)
+                            {
+                                <a asp-area="" asp-controller="Gallery" asp-action="Details" asp-route-id="@line.ArtworkId">@line.Artwork.Title</a>
+                            }
+                            else
+                            {
+                                <span class="muted">(removed artwork)</span>
+                            }
+                        </td>
+                        <td>@line.Price.ToMoney()</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@if (Model.OrderType == OrderType.Commission)
+{
+    <section class="panel mb-4">
+        <div class="panel-head"><h2>Progress photos</h2></div>
+        @if (Model.ProgressPhotos.Count == 0)
+        {
+            <div class="empty"><i class="bi bi-camera"></i><p>The artist has not uploaded progress photos yet.</p></div>
+        }
+        else
+        {
+            <div class="photo-list">
+                @foreach (var photo in Model.ProgressPhotos.OrderBy(p => p.UploadedAt))
+                {
+                    <figure>
+                        <img src="@photo.ImageUrl" alt="Progress photo" />
+                        <figcaption>@photo.UploadedAt.ToDateText()@(string.IsNullOrWhiteSpace(photo.Note) ? "" : " · " + photo.Note)</figcaption>
+                    </figure>
+                }
+            </div>
+        }
+    </section>
+}
+
+@if (Model.Status == OrderStatus.Delivered)
+{
+    <section class="panel form-panel" style="max-width:none">
+        <h2 class="h5">Rate this order</h2>
+        <form asp-action="Review" asp-route-id="@Model.Id" method="post">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label" for="rating">Rating</label>
+                    <select id="rating" name="rating" class="form-select">
+                        @for (var i = 5; i >= 1; i--)
+                        {
+                            <option value="@i">@i out of 5</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label" for="comment">Comment (optional)</label>
+                    <input id="comment" name="comment" class="form-control" maxlength="500" />
+                </div>
+            </div>
+            <div class="form-actions"><button type="submit" class="btn btn-primary">Save review</button></div>
+        </form>
+    </section>
+}

@@ -1,0 +1,75 @@
+@model RequestDetailsViewModel
+@{
+    var request = Model.Request;
+    ViewData["Title"] = request.Title;
+}
+<div class="page-head">
+    <div>
+        <h1>@request.Title</h1>
+        <p>Compare the proposals and accept the one you like.</p>
+    </div>
+</div>
+
+<section class="panel form-panel mb-4" style="max-width:none">
+    <dl class="detail-list">
+        <dt>Status</dt><dd><span class="pill @(request.Status == RequestStatus.Open ? "pill-ok" : request.Status == RequestStatus.Accepted ? "pill-role" : request.Status == RequestStatus.Cancelled ? "pill-bad" : "pill-muted")">@request.Status</span></dd>
+        <dt>Category</dt><dd>@request.Category.Name</dd>
+        <dt>Canvas size</dt><dd>@request.CanvasSize</dd>
+        <dt>Budget</dt><dd>@request.BudgetMin.ToMoney() to @request.BudgetMax.ToMoney()</dd>
+        <dt>Needed by</dt><dd>@request.Deadline.ToDateText()</dd>
+        <dt>Description</dt><dd>@request.Description</dd>
+    </dl>
+    @if (!string.IsNullOrWhiteSpace(request.ReferenceImageUrl))
+    {
+        <div class="gallery mt-3"><img src="@request.ReferenceImageUrl" alt="Reference photo" class="gallery-img" /></div>
+    }
+    @if (request.Status == RequestStatus.Open)
+    {
+        <form asp-action="Cancel" asp-route-id="@request.Id" method="post" class="form-actions" onsubmit="return confirm('Cancel this request?');">
+            <button type="submit" class="btn btn-outline-secondary">Cancel request</button>
+        </form>
+    }
+</section>
+
+<section class="panel">
+    <div class="panel-head"><h2>Proposals (@Model.Proposals.Count)</h2></div>
+    @if (Model.Proposals.Count == 0)
+    {
+        <div class="empty"><i class="bi bi-chat-left-text"></i><p>No proposals yet. Artists can see your request and send an offer.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table ledger">
+                <thead><tr><th>Artist</th><th>Price</th><th>Delivery</th><th>Revisions</th><th>Message</th><th>Status</th><th class="text-end"></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.Proposals)
+                {
+                    <tr>
+                        <td>
+                            <a asp-area="" asp-controller="Artists" asp-action="Details" asp-route-id="@item.ArtistProfileId">@item.ArtistProfile.User.FullName</a>
+                            @if (item.ArtistProfile.IsVerified)
+                            {
+                                <i class="bi bi-patch-check-fill verified" title="Verified artist"></i>
+                            }
+                        </td>
+                        <td>@item.Price.ToMoney()</td>
+                        <td>@item.DeliveryDays days</td>
+                        <td>@item.RevisionsIncluded</td>
+                        <td class="cell-wrap">@item.Message</td>
+                        <td><span class="pill @(item.Status == ProposalStatus.Accepted ? "pill-ok" : item.Status == ProposalStatus.Pending ? "pill-role" : item.Status == ProposalStatus.Rejected ? "pill-bad" : "pill-muted")">@item.Status</span></td>
+                        <td class="text-end">
+                            @if (request.Status == RequestStatus.Open && item.Status == ProposalStatus.Pending)
+                            {
+                                <form asp-action="Accept" asp-route-id="@item.Id" method="post" class="m-0" onsubmit="return confirm('Accept this proposal? The other proposals will be rejected.');">
+                                    <button type="submit" class="btn btn-primary btn-sm">Accept</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

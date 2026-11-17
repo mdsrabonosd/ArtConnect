@@ -50,6 +50,7 @@
                 <button class="icon-btn d-lg-none" type="button" aria-label="Open menu" data-toggle-sidebar><i class="bi bi-list"></i></button>
                 <div class="topbar-title">@ViewData["Title"]</div>
                 <div class="topbar-user">
+                    <a class="btn btn-outline-secondary btn-sm" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-box-arrow-up-right"></i> View site</a>
                     <span class="user-chip"><i class="bi bi-person-circle"></i> @User.Identity?.Name</span>
                     <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
                         <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-box-arrow-right"></i> Sign out</button>

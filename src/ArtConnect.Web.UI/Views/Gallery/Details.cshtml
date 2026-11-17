@@ -1,0 +1,125 @@
+@model ArtworkDetailsModel
+@{
+    var art = Model.Artwork;
+    ViewData["Title"] = art.Title;
+    ViewData["Wide"] = true;
+    var images = art.Images.OrderByDescending(i => i.IsMain).ToList();
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    var meId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var parsed) ? parsed : 0;
+    var isOwn = signedIn && art.ArtistProfile.UserId == meId;
+}
+
+<a class="back-link" asp-action="Index"><i class="bi bi-arrow-left"></i> Back to gallery</a>
+
+<div class="detail-grid">
+    <section class="detail-media">
+        @if (images.Count > 0)
+        {
+            <img class="detail-main" src="@images[0].ImageUrl" alt="@art.Title" />
+            @if (images.Count > 1)
+            {
+                <div class="detail-thumbs">
+                    @foreach (var image in images.Skip(1))
+                    {
+                        <img src="@image.ImageUrl" alt="@art.Title" />
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="detail-main art-card-empty"><i class="bi bi-image"></i></div>
+        }
+    </section>
+
+    <section class="detail-info panel">
+        <span class="pill pill-role">@art.Category.Name</span>
+        <h1>@art.Title</h1>
+        <p class="art-meta">
+            by <a asp-controller="Artists" asp-action="Details" asp-route-id="@art.ArtistProfileId">@art.ArtistProfile.User.FullName</a>
+            @if (art.ArtistProfile.IsVerified)
+            {
+                <i class="bi bi-patch-check-fill verified" title="Verified artist"></i>
+            }
+        </p>
+
+        <div class="price-lg">@art.Price.ToMoney()</div>
+        <dl class="spec-list">
+            <dt>Medium</dt><dd>@art.Medium</dd>
+            <dt>Size</dt><dd>@(string.IsNullOrWhiteSpace(art.Size) ? "-" : art.Size)</dd>
+            <dt>Type</dt><dd>@(art.IsOriginal ? "Original painting" : "Print")</dd>
+            <dt>Status</dt><dd>@(art.Status == ArtworkStatus.Available ? "Available" : "Sold")</dd>
+        </dl>
+
+        @if (!string.IsNullOrWhiteSpace(art.Description))
+        {
+            <p class="detail-desc">@art.Description</p>
+        }
+
+        <div class="detail-actions">
+            @if (signedIn)
+            {
+                <form asp-action="ToggleLike" asp-route-id="@art.Id" method="post" class="m-0">
+                    <button type="submit" class="btn @(Model.IsLiked ? "btn-primary" : "btn-outline-secondary")">
+                        <i class="bi @(Model.IsLiked ? "bi-heart-fill" : "bi-heart")"></i> @Model.LikeCount
+                    </button>
+                </form>
+                <form asp-action="ToggleWishlist" asp-route-id="@art.Id" method="post" class="m-0">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="bi @(Model.IsWishlisted ? "bi-bookmark-fill" : "bi-bookmark")"></i> @(Model.IsWishlisted ? "Saved" : "Save")
+                    </button>
+                </form>
+                @if (User.IsInRole(AppRoles.Customer) && art.Status == ArtworkStatus.Available && !isOwn)
+                {
+                    <form asp-area="Customer" asp-controller="Cart" asp-action="Add" asp-route-id="@art.Id" method="post" class="m-0">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-bag-plus"></i> Add to cart</button>
+                    </form>
+                }
+            }
+            else
+            {
+                <span class="btn btn-outline-secondary disabled"><i class="bi bi-heart"></i> @Model.LikeCount</span>
+                <a class="btn btn-primary" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Sign in to like, save or buy</a>
+            }
+        </div>
+    </section>
+</div>
+
+<section class="panel comments-panel">
+    <h2>Comments (@Model.Comments.Count)</h2>
+
+    @if (signedIn)
+    {
+        <form asp-action="AddComment" asp-route-id="@art.Id" method="post" class="comment-form">
+            <label for="text" class="visually-hidden">Write a comment</label>
+            <textarea id="text" name="text" class="form-control" rows="2" maxlength="300" placeholder="Write a comment (up to 300 characters)" required></textarea>
+            <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+    }
+
+    @if (Model.Comments.Count == 0)
+    {
+        <p class="muted mb-0">No comments yet.</p>
+    }
+    else
+    {
+        <ul class="comment-list">
+            @foreach (var comment in Model.Comments)
+            {
+                <li>
+                    <div class="comment-head">
+                        <strong>@comment.User.FullName</strong>
+                        <span class="muted small">@comment.CreatedAt.ToDateText()</span>
+                        @if (comment.UserId == meId)
+                        {
+                            <form asp-action="DeleteComment" asp-route-id="@comment.Id" asp-route-artworkId="@art.Id" method="post" class="m-0 ms-auto">
+                                <button type="submit" class="icon-btn danger" title="Delete my comment"><i class="bi bi-trash"></i></button>
+                            </form>
+                        }
+                    </div>
+                    <p>@comment.Text</p>
+                </li>
+            }
+        </ul>
+    }
+</section>
